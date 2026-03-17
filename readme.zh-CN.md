@@ -122,6 +122,14 @@ EUI 是一个轻量、头文件式（header-only）的 C++ UI 工具包，偏重
 
 ```text
 EUI/
+|- .github/
+|  `- workflows/
+|     `- release.yml
+|- cmake/
+|  `- EUIConfig.cmake.in
+|- docs/
+|  |- anchor-layout-checklist.md
+|  `- backend-abstraction-checklist.md
 |- include/
 |  `- EUI.h
 |  |- stb_truetype.h
@@ -183,6 +191,32 @@ cmake --build build
 ```bash
 cmake -S . -B build -G Ninja -DEUI_BUILD_EXAMPLES=ON -DEUI_FETCH_GLFW_FROM_GIT=OFF
 ```
+
+## 自动发版与打包
+
+仓库已经新增 GitHub Actions 工作流：[`.github/workflows/release.yml`](.github/workflows/release.yml)。
+只要推送以 `v` 开头的 tag，就会自动在 Windows 和 Linux 上执行 CMake 配置、构建，并通过 `cpack` 产出发布包。
+
+常规发布方式：
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+自动产物：
+
+- Windows：`.zip`
+- Linux：`.tar.gz`
+
+打包内容包括：
+
+- `include/`
+- CMake 包配置文件（`EUIConfig.cmake`、`EUIConfigVersion.cmake`、导出 targets）
+- `readme.md` 与 `readme.zh-CN.md`
+- `docs/`
+- `examples/`
+- 若打包时启用了示例目标，也会带上对应 demo 可执行文件
 
 ## 运行示例
 

@@ -1,0 +1,83 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows-x64
+            os: windows-latest
+            cmake_generator: "Visual Studio 17 2022"
+            cmake_args: "-A x64"
+            config: Release
+            cpack_generator: ZIP
+            artifact_glob: "dist/*.zip"
+          - name: linux-x86_64
+            os: ubuntu-latest
+            cmake_generator: Ninja
+            cmake_args: ""
+            config: Release
+            cpack_generator: TGZ
+            artifact_glob: "dist/*.tar.gz"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build pkg-config xorg-dev libgl1-mesa-dev
+
+      - name: Configure
+        shell: bash
+        run: >
+          cmake -S . -B build
+          -G "${{ matrix.cmake_generator }}"
+          ${{ matrix.cmake_args }}
+          -DEUI_BUILD_EXAMPLES=ON
+          -DEUI_FETCH_GLFW_FROM_GIT=ON
+          -DGLFW_BUILD_WAYLAND=OFF
+          -DCPACK_PACKAGE_FILE_NAME=EUI-${{ github.ref_name }}-${{ matrix.name }}
+
+      - name: Build
+        run: cmake --build build --config ${{ matrix.config }}
+
+      - name: Package
+        run: cpack --config build/CPackConfig.cmake -C ${{ matrix.config }} -G ${{ matrix.cpack_generator }} -B dist
+
+      - name: Upload packaged artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-${{ matrix.name }}
+          path: ${{ matrix.artifact_glob }}
+          if-no-files-found: error
+
+  release:
+    name: Publish Release
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Download packaged artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/*
+          generate_release_notes: true

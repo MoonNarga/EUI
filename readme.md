@@ -122,6 +122,14 @@ The current motion defaults are tuned to stay compatible with event-driven rende
 
 ```text
 EUI/
+|- .github/
+|  `- workflows/
+|     `- release.yml
+|- cmake/
+|  `- EUIConfig.cmake.in
+|- docs/
+|  |- anchor-layout-checklist.md
+|  `- backend-abstraction-checklist.md
 |- include/
 |  `- EUI.h
 |  |- stb_truetype.h
@@ -183,6 +191,32 @@ If network/Git access is restricted:
 ```bash
 cmake -S . -B build -G Ninja -DEUI_BUILD_EXAMPLES=ON -DEUI_FETCH_GLFW_FROM_GIT=OFF
 ```
+
+## Release Packaging
+
+GitHub Actions now includes an automated release workflow at [`.github/workflows/release.yml`](.github/workflows/release.yml).
+Any pushed tag that starts with `v` triggers a release build on Windows and Linux, then runs CMake packaging through `cpack`.
+
+Typical release flow:
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+Produced release assets:
+
+- Windows package: `.zip`
+- Linux package: `.tar.gz`
+
+The generated packages install:
+
+- `include/`
+- CMake package config files (`EUIConfig.cmake`, `EUIConfigVersion.cmake`, exported targets)
+- `readme.md` and `readme.zh-CN.md`
+- `docs/`
+- `examples/`
+- demo executables when example targets are enabled during packaging
 
 ## Run Examples
 
