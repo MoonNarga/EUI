@@ -2,6 +2,21 @@
 
 This directory is intentionally small.
 
+## Preview
+
+<table>
+  <tr>
+    <td><img src="../preview/0.jpg" alt="Preview 0" width="100%"></td>
+    <td><img src="../preview/1.jpg" alt="Preview 1" width="100%"></td>
+    <td><img src="../preview/2.jpg" alt="Preview 2" width="100%"></td>
+  </tr>
+  <tr>
+    <td><img src="../preview/3.jpg" alt="Preview 3" width="100%"></td>
+    <td><img src="../preview/4.jpg" alt="Preview 4" width="100%"></td>
+    <td><img src="../preview/5.jpg" alt="Preview 5" width="100%"></td>
+  </tr>
+</table>
+
 Current recommended reading order:
 
 1. `quick-ui-tutorial.zh-CN.md`
