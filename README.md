@@ -64,10 +64,18 @@ int main() {
 - [docs/guide/components-and-custom-node.md](./docs/guide/components-and-custom-node.md)
 - [docs/guide/runtime-network-fonts.md](./docs/guide/runtime-network-fonts.md)
 
-## ⭐ Stats
+## ⭐ Project Stats
 
-![Stars](https://img.shields.io/github/stars/用户名/仓库?style=for-the-badge)
+<p align="center">
+  <img src="https://img.shields.io/github/stars/sudoevolve/EUI?style=for-the-badge" />
+  <img src="https://img.shields.io/github/forks/sudoevolve/EUI?style=for-the-badge" />
+  <img src="https://img.shields.io/github/issues/sudoevolve/EUI?style=for-the-badge" />
+</p>
+
+---
 
 ## 📈 Star History
 
-[![Star History](https://api.star-history.com/svg?repos=sudoevolve/EUI&type=Date)](https://star-history.com/sudoevolve/EUI&Date)
+<p align="center">
+  <img src="https://api.star-history.com/svg?repos=sudoevolve/EUI&type=Date&theme=dark" />
+</p>
