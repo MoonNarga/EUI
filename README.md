@@ -76,6 +76,4 @@ int main() {
 
 ## 📈 Star History
 
-## Star History
-
 [![Star History Chart](https://api.star-history.com/image?repos=sudoevolve/EUI&type=date&legend=top-left)](https://www.star-history.com/?repos=sudoevolve%2FEUI&type=date&legend=top-left)
