@@ -81,6 +81,22 @@ public:
         return popupPresentation_ && (isOpen_ || openAnim_ > 0.001f);
     }
 
+    bool interactiveContains(float x, float y) const override {
+        const RectFrame frame = PrimitiveFrame(primitive_);
+        if (contains(frame, x, y)) {
+            return true;
+        }
+        if (!(isOpen_ || openAnim_ > 0.001f)) {
+            return false;
+        }
+        const float visibleOpen = std::clamp(openAnim_, 0.0f, 1.0f);
+        const float visibleListHeight = listVisibleHeight(frame.height, items_.size(), maxVisibleItems_, visibleOpen);
+        if (visibleListHeight <= 0.0f) {
+            return false;
+        }
+        return contains(PopupListFrame(frame, visibleListHeight, listOverlap(visibleListHeight)), x, y);
+    }
+
     bool wantsContinuousUpdate() const override {
         if (hoverAnim_ > 0.001f && hoverAnim_ < 0.999f) {
             return true;
@@ -428,6 +444,11 @@ private:
 
     static float listOverlap(float visibleListHeight) {
         return visibleListHeight > 6.0f ? 1.0f : 0.0f;
+    }
+
+    static bool contains(const RectFrame& frame, float x, float y) {
+        return x >= frame.x && x <= frame.x + frame.width &&
+               y >= frame.y && y <= frame.y + frame.height;
     }
 
     void ensureRuntimeState() {

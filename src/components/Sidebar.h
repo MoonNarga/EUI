@@ -289,9 +289,7 @@ inline void SidebarNode::draw() {
 
         Color highlight = selected
             ? Color(0.0f, 0.0f, 0.0f, 0.0f)
-            : Lerp(Color(0.0f, 0.0f, 0.0f, 0.0f),
-                   withAlpha(CurrentTheme->surfaceHover, CurrentTheme == &DarkTheme ? 0.90f : 0.80f),
-                   itemHover_[index]);
+            : withAlpha(CurrentTheme->text, (CurrentTheme == &DarkTheme ? 0.08f : 0.06f) * itemHover_[index]);
         if (highlight.a > 0.01f) {
             Renderer::DrawRect(frame.x, frame.y, frame.width, frame.height, highlight, 14.0f);
         }
@@ -299,8 +297,7 @@ inline void SidebarNode::draw() {
         const float iconScale = 20.0f / 24.0f;
         const Color iconColor = selected
             ? withAlpha(CurrentTheme->text, 0.98f)
-            : Lerp(withAlpha(CurrentTheme->text, CurrentTheme == &DarkTheme ? 0.60f : 0.72f),
-                   withAlpha(CurrentTheme->text, 0.96f), itemHover_[index]);
+            : withAlpha(CurrentTheme->text, CurrentTheme == &DarkTheme ? 0.72f : 0.78f);
 
         const RectFrame iconBounds = Renderer::MeasureTextBounds(items_[index].icon, iconScale);
         const float iconX = showLabels
@@ -314,8 +311,7 @@ inline void SidebarNode::draw() {
             const float labelScale = labelFontSize / 24.0f;
             const Color labelColor = selected
                 ? withAlpha(CurrentTheme->text, 0.98f)
-                : Lerp(withAlpha(CurrentTheme->text, CurrentTheme == &DarkTheme ? 0.68f : 0.80f),
-                       withAlpha(CurrentTheme->text, 0.96f), itemHover_[index] * 0.85f);
+                : withAlpha(CurrentTheme->text, CurrentTheme == &DarkTheme ? 0.78f : 0.84f);
             Renderer::DrawTextStr(items_[index].label,
                                   frame.x + kIconInset + kIconSlotWidth + kLabelGap,
                                   centeredTextY(frame, items_[index].label, labelScale, labelFontSize * 0.8f),
@@ -324,9 +320,15 @@ inline void SidebarNode::draw() {
     }
 
     const RectFrame toggleFrame = themeFrameFor(shell);
-    const float toggleMix = std::clamp(0.14f + themeHover_ * 0.14f + (themePressed_ ? 0.14f : 0.0f), 0.0f, 0.38f);
+    const float toggleAlpha = std::clamp(
+        (CurrentTheme == &DarkTheme ? 0.10f : 0.07f) +
+        themeHover_ * (CurrentTheme == &DarkTheme ? 0.08f : 0.05f) +
+        (themePressed_ ? 0.06f : 0.0f),
+        0.0f,
+        0.24f
+    );
     Renderer::DrawRect(toggleFrame.x, toggleFrame.y, toggleFrame.width, toggleFrame.height,
-                       Lerp(CurrentTheme->surfaceHover, CurrentTheme->primary, toggleMix), 14.0f);
+                       withAlpha(CurrentTheme->text, toggleAlpha), 14.0f);
 
     const float iconScale = 18.0f / 24.0f;
     const std::string moonIcon = "\xEF\x86\x86";

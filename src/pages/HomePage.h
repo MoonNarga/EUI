@@ -22,12 +22,17 @@ public:
         std::function<void(const std::string&)> onTextAreaChange;
         std::function<void(int)> onComboChange;
         std::function<void(int)> onTableRowChange;
+        std::function<void(int, int, int)> onDateChange;
+        std::function<void(int, int)> onTimeChange;
+        std::function<void(Color)> onColorChange;
     };
 
     static void Compose(UIContext& ui, const std::string& idPrefix, const RectFrame& bounds,
                         bool iconAccentEnabled, float progressValue, int segmentedIndex, int tabIndex,
                         const std::string& inputText, const std::string& textAreaText,
                         int comboSelection, int tableSelection, bool tableToastTrigger,
+                        int dateYear, int dateMonth, int dateDay, int timeHour, int timeMinute,
+                        const Color& pickedColor,
                         const Actions& actions) {
         if (bounds.width <= 0.0f || bounds.height <= 0.0f) {
             return;
@@ -64,6 +69,10 @@ public:
                 + 186.0f
                 + visuals.sectionGap
                 + 274.0f
+                + visuals.sectionGap
+                + 250.0f
+                + visuals.sectionGap
+                + 126.0f
                 + visuals.sectionGap
                 + 132.0f
                 + visuals.sectionInset,
@@ -415,7 +424,146 @@ public:
 
                 y += 274.0f + visuals.sectionGap;
 
+                ComposePageSection(ui, idPrefix + ".charts", RectFrame{contentX, y, contentWidth, 250.0f});
+
+                ui.label(idPrefix + ".charts.title")
+                    .text("Charts")
+                    .position(innerX, y + 30.0f)
+                    .fontSize(visuals.labelSize)
+                    .color(visuals.titleColor)
+                    .build();
+
+                const float chartGap = 12.0f;
+                const float chartWidth = std::max(124.0f, (contentWidth - 36.0f - chartGap * 2.0f) / 3.0f);
+                const float chartHeight = 178.0f;
+                const float chartY = y + 54.0f;
+                const std::vector<float> lineValues = {
+                    24.0f + progressValue * 4.0f,
+                    30.0f + static_cast<float>(segmentedIndex) * 2.0f,
+                    26.0f + static_cast<float>(std::max(0, comboSelection)) * 2.0f,
+                    39.0f + progressValue * 5.0f,
+                    36.0f + static_cast<float>(tabIndex) * 3.0f,
+                    52.0f + progressValue * 6.0f
+                };
+                const std::vector<float> barValues = {
+                    28.0f + progressValue * 24.0f,
+                    18.0f + static_cast<float>(tabIndex) * 10.0f,
+                    34.0f + static_cast<float>(segmentedIndex) * 8.0f,
+                    22.0f + (iconAccentEnabled ? 18.0f : 4.0f)
+                };
+                const std::vector<float> pieValues = {
+                    32.0f + progressValue * 12.0f,
+                    24.0f + static_cast<float>(segmentedIndex) * 4.0f,
+                    18.0f + static_cast<float>(std::max(0, comboSelection)) * 3.0f,
+                    iconAccentEnabled ? 26.0f : 16.0f
+                };
+                const std::vector<Color> chartPalette = {
+                    CurrentTheme->primary,
+                    Color(0.18f, 0.78f, 0.60f, 1.0f),
+                    Color(0.96f, 0.62f, 0.18f, 1.0f),
+                    Color(0.88f, 0.30f, 0.46f, 1.0f)
+                };
+
+                ui.lineChart(idPrefix + ".lineChart")
+                    .position(innerX, chartY)
+                    .size(chartWidth, chartHeight)
+                    .title("Trend")
+                    .values(lineValues)
+                    .labels({"Jan", "Feb", "Mar", "Apr", "May", "Jun"})
+                    .color(CurrentTheme->primary)
+                    .fill(true)
+                    .smooth(false)
+                    .onPointClick([action = actions.onComboChange](int index) {
+                        if (action) {
+                            action(index % 3);
+                        }
+                    })
+                    .build();
+
+                ui.barChart(idPrefix + ".barChart")
+                    .position(innerX + chartWidth + chartGap, chartY)
+                    .size(chartWidth, chartHeight)
+                    .title("Volume")
+                    .values(barValues)
+                    .labels({"Q1", "Q2", "Q3", "Q4"})
+                    .colors(chartPalette)
+                    .onBarClick([action = actions.onSegmentedChange](int index) {
+                        if (action) {
+                            action(index % 3);
+                        }
+                    })
+                    .build();
+
+                ui.pieChart(idPrefix + ".pieChart")
+                    .position(innerX + (chartWidth + chartGap) * 2.0f, chartY)
+                    .size(chartWidth, chartHeight)
+                    .title("Share")
+                    .values(pieValues)
+                    .labels({"Core", "Lab", "Ops", "Edge"})
+                    .colors(chartPalette)
+                    .onSliceClick([action = actions.onTabChange](int index) {
+                        if (action) {
+                            action(index % 3);
+                        }
+                    })
+                    .build();
+
+                y += 250.0f + visuals.sectionGap;
+
+                ComposePageSection(ui, idPrefix + ".pickers", RectFrame{contentX, y, contentWidth, 126.0f});
+
+                ui.label(idPrefix + ".pickers.title")
+                    .text("Pickers")
+                    .position(innerX, y + 30.0f)
+                    .fontSize(visuals.labelSize)
+                    .color(visuals.titleColor)
+                    .build();
+
+                const float pickerGap = 12.0f;
+                const float pickerWidth = std::max(124.0f, (contentWidth - 36.0f - pickerGap * 2.0f) / 3.0f);
+                const float pickerY = y + 62.0f;
+
+                ui.datePicker(idPrefix + ".datePicker")
+                    .position(innerX, pickerY)
+                    .size(pickerWidth, visuals.fieldHeight)
+                    .date(dateYear, dateMonth, dateDay)
+                    .fontSize(15.0f)
+                    .onChange([action = actions.onDateChange](int year, int month, int day) {
+                        if (action) {
+                            action(year, month, day);
+                        }
+                    })
+                    .build();
+
+                ui.timePicker(idPrefix + ".timePicker")
+                    .position(innerX + pickerWidth + pickerGap, pickerY)
+                    .size(pickerWidth, visuals.fieldHeight)
+                    .time(timeHour, timeMinute)
+                    .minuteStep(1)
+                    .fontSize(15.0f)
+                    .onChange([action = actions.onTimeChange](int hour, int minute) {
+                        if (action) {
+                            action(hour, minute);
+                        }
+                    })
+                    .build();
+
+                ui.colorPicker(idPrefix + ".colorPicker")
+                    .position(innerX + (pickerWidth + pickerGap) * 2.0f, pickerY)
+                    .size(pickerWidth, visuals.fieldHeight)
+                    .value(pickedColor)
+                    .fontSize(15.0f)
+                    .onChange([action = actions.onColorChange](Color color) {
+                        if (action) {
+                            action(color);
+                        }
+                    })
+                    .build();
+
+                y += 126.0f + visuals.sectionGap;
+
                 ComposePageSection(ui, idPrefix + ".colors", RectFrame{contentX, y, contentWidth, 132.0f});
+
 
                 ui.panel(idPrefix + ".colors.primary")
                     .position(innerX, y + 30.0f)

@@ -1,12 +1,17 @@
 #pragma once
 
 #include "UIBuilder.h"
+#include "../components/BarChart.h"
 #include "../components/Button.h"
+#include "../components/ColorPicker.h"
 #include "../components/ComboBox.h"
+#include "../components/DatePicker.h"
 #include "../components/Image.h"
 #include "../components/InputBox.h"
 #include "../components/Label.h"
+#include "../components/LineChart.h"
 #include "../components/Panel.h"
+#include "../components/PieChart.h"
 #include "../components/Polygon.h"
 #include "../components/ProgressBar.h"
 #include "../components/ScrollArea.h"
@@ -23,6 +28,7 @@
 #include "../components/Tabs.h"
 #include "../components/Toast.h"
 #include "../components/Table.h"
+#include "../components/TimePicker.h"
 #include <memory>
 #include <string>
 #include <type_traits>

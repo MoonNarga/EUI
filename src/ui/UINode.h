@@ -122,6 +122,10 @@ public:
         return false;
     }
 
+    virtual bool interactiveContains(float x, float y) const {
+        return PrimitiveContains(primitive_, x, y);
+    }
+
     virtual const char* typeName() const = 0;
     virtual void update() = 0;
     virtual void draw() = 0;
@@ -206,7 +210,7 @@ protected:
         if (State.inputBlockedByPopup && primitive_.renderLayer != RenderLayer::Popup) {
             return false;
         }
-        return PrimitiveContains(primitive_, x, y);
+        return interactiveContains(x, y);
     }
 
     bool hovered() const {

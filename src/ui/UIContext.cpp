@@ -578,7 +578,7 @@ void UIContext::update() {
             if (State.inputBlockedByPopup && primitive.renderLayer != RenderLayer::Popup) {
                 continue;
             }
-            if (!PrimitiveContains(primitive, State.mouseX, State.mouseY)) {
+            if (!node->interactiveContains(State.mouseX, State.mouseY)) {
                 continue;
             }
             currentPointerHotNodes.push_back(node);

@@ -95,6 +95,13 @@ public:
         return open_ || visibilityAnim_ > 0.001f;
     }
 
+    bool interactiveContains(float x, float y) const override {
+        if (visibilityAnim_ <= 0.001f && !open_) {
+            return false;
+        }
+        return contains(makeLayout().overlay, x, y);
+    }
+
     bool wantsContinuousUpdate() const override {
         const float target = open_ ? 1.0f : 0.0f;
         return std::abs(visibilityAnim_ - target) > 0.001f ||

@@ -205,6 +205,9 @@ private:
             actions.onTextAreaChange = [this](const std::string& text) { SetTextAreaText(text); };
             actions.onComboChange = [this](int index) { SetComboSelection(index); };
             actions.onTableRowChange = [this](int index) { SetTableSelection(index); };
+            actions.onDateChange = [this](int year, int month, int day) { SetPickedDate(year, month, day); };
+            actions.onTimeChange = [this](int hour, int minute) { SetPickedTime(hour, minute); };
+            actions.onColorChange = [this](Color color) { SetPickedColor(color); };
 
             HomePage::Compose(
                 ui_,
@@ -219,6 +222,12 @@ private:
                 comboSelection_,
                 tableSelection_,
                 tableToastTrigger_,
+                pickedYear_,
+                pickedMonth_,
+                pickedDay_,
+                pickedHour_,
+                pickedMinute_,
+                pickedColor_,
                 actions
             );
             break;
@@ -311,6 +320,44 @@ private:
         ++stateVersion_;
     }
 
+    void SetPickedDate(int year, int month, int day) {
+        const int clampedYear = std::clamp(year, 1900, 2200);
+        const int clampedMonth = std::clamp(month, 1, 12);
+        const int clampedDay = std::clamp(day, 1, 31);
+        if (pickedYear_ == clampedYear && pickedMonth_ == clampedMonth && pickedDay_ == clampedDay) {
+            return;
+        }
+        pickedYear_ = clampedYear;
+        pickedMonth_ = clampedMonth;
+        pickedDay_ = clampedDay;
+        ++stateVersion_;
+    }
+
+    void SetPickedTime(int hour, int minute) {
+        const int clampedHour = std::clamp(hour, 0, 23);
+        const int clampedMinute = std::clamp(minute, 0, 59);
+        if (pickedHour_ == clampedHour && pickedMinute_ == clampedMinute) {
+            return;
+        }
+        pickedHour_ = clampedHour;
+        pickedMinute_ = clampedMinute;
+        ++stateVersion_;
+    }
+
+    void SetPickedColor(Color color) {
+        color.a = 1.0f;
+        if (std::abs(pickedColor_.r - color.r) < 0.0001f &&
+            std::abs(pickedColor_.g - color.g) < 0.0001f &&
+            std::abs(pickedColor_.b - color.b) < 0.0001f) {
+            return;
+        }
+        pickedColor_ = color;
+        LightTheme.primary = color;
+        DarkTheme.primary = color;
+        ++stateVersion_;
+        ui_.requestThemeRefresh(0.18f);
+    }
+
     void RandomizeThemeColor() {
         static const std::array<Color, 10> accentPalette{{
             Color(0.20f, 0.50f, 0.90f),
@@ -365,6 +412,12 @@ private:
     int tabIndex_ = 0;
     int tableSelection_ = -1;
     bool tableToastTrigger_ = false;
+    int pickedYear_ = 2026;
+    int pickedMonth_ = 4;
+    int pickedDay_ = 19;
+    int pickedHour_ = 9;
+    int pickedMinute_ = 30;
+    Color pickedColor_ = Color(0.20f, 0.50f, 0.90f, 1.0f);
     float layoutSplit_ = 0.42f;
     std::uint32_t randomSeed_ = 0xC0FFEE11u;
     int accentIndex_ = 0;

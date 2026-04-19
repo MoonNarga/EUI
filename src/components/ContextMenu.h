@@ -68,6 +68,14 @@ public:
         return open_ || visibilityAnim_ > 0.001f;
     }
 
+    bool interactiveContains(float x, float y) const override {
+        const RectFrame frame = PrimitiveFrame(primitive_);
+        if (contains(frame, x, y)) {
+            return true;
+        }
+        return (open_ || visibilityAnim_ > 0.001f) && contains(popupFrame(frame), x, y);
+    }
+
     bool wantsContinuousUpdate() const override {
         if (visibilityAnim_ > 0.001f && visibilityAnim_ < 0.999f) {
             return true;
@@ -106,6 +114,9 @@ public:
             if (open_) {
                 popupX_ = State.mouseX;
                 popupY_ = State.mouseY;
+                for (float& hover : itemHover_) {
+                    hover = 0.0f;
+                }
                 State.inputBlockedByPopup = true;
             }
             State.mouseRightClicked = false;
@@ -145,10 +156,21 @@ public:
                 }
             }
         }
+        if (open_ && State.mouseRightClicked) {
+            if (!contains(popup, State.mouseX, State.mouseY)) {
+                popupX_ = State.mouseX;
+                popupY_ = State.mouseY;
+                for (float& hover : itemHover_) {
+                    hover = 0.0f;
+                }
+            }
+            State.mouseRightClicked = false;
+            requestVisualRepaint(0.14f);
+        }
 
         for (int index = 0; index < static_cast<int>(items_.size()); ++index) {
             const RectFrame item = itemFrame(popup, index);
-            const bool hoveredItem = open_ && inputAllowed && contains(item, State.mouseX, State.mouseY);
+            const bool hoveredItem = open_ && contains(item, State.mouseX, State.mouseY);
             if (animateTowards(itemHover_[index], hoveredItem ? 1.0f : 0.0f, State.deltaTime * 16.0f)) {
                 requestVisualRepaint(0.12f);
             }
